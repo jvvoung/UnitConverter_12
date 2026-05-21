@@ -18,8 +18,9 @@ TEST_CASE("negative_value_throws_invalid_argument", "[ui][green]") {
     REQUIRE_THROWS_AS(service.convert("meter:-1.0"), std::invalid_argument);
 }
 
-TEST_CASE("unknown_unit_throws_invalid_argument", "[ui][red]") {
-    FAIL("RED");
+TEST_CASE("unknown_unit_throws_invalid_argument", "[ui][green]") {
+    ConversionApplicationService service;
+    REQUIRE_THROWS_AS(service.convert("parsec:1.0"), std::invalid_argument);
 }
 
 TEST_CASE("output_preserves_source_unit_and_value", "[ui][red]") {
