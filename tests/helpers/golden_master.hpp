@@ -226,32 +226,83 @@ inline std::string buildGoldenDocumentFromCli(const std::filesystem::path& cli_p
     return document.str();
 }
 
-inline std::string makeUnifiedDiff(const std::string& expected, const std::string& actual) {
-    std::istringstream expected_stream(expected);
-    std::istringstream actual_stream(actual);
-    std::ostringstream diff;
-
-    std::string expected_line;
-    std::string actual_line;
-    std::size_t line_number = 1;
-    while (true) {
-        const bool has_expected = static_cast<bool>(std::getline(expected_stream, expected_line));
-        const bool has_actual = static_cast<bool>(std::getline(actual_stream, actual_line));
-        if (!has_expected && !has_actual) {
-            break;
-        }
-        if (expected_line != actual_line) {
-            diff << "L" << line_number << "\n";
-            if (has_expected) {
-                diff << "- " << expected_line << "\n";
-            }
-            if (has_actual) {
-                diff << "+ " << actual_line << "\n";
-            }
-        }
-        ++line_number;
+inline std::vector<std::string> splitLines(const std::string& text) {
+    std::vector<std::string> lines;
+    std::istringstream stream(text);
+    std::string line;
+    while (std::getline(stream, line)) {
+        line = stripCarriageReturn(line);
+        lines.push_back(line);
     }
+    return lines;
+}
+
+inline std::string extractSection(const std::string& document, const std::string& scenario) {
+    const std::string header = "[" + scenario + "]\n";
+    const auto start = document.find(header);
+    if (start == std::string::npos) {
+        throw std::runtime_error("Golden master section not found: " + scenario);
+    }
+
+    const auto end = document.find("---\n", start);
+    if (end == std::string::npos) {
+        throw std::runtime_error("Golden master section terminator missing: " + scenario);
+    }
+
+    return document.substr(start, end - start + 4);
+}
+
+inline std::string makeUnifiedDiff(const std::string& expected, const std::string& actual) {
+    if (expected == actual) {
+        return {};
+    }
+
+    const auto expected_lines = splitLines(expected);
+    const auto actual_lines = splitLines(actual);
+    const std::size_t max_lines = std::max(expected_lines.size(), actual_lines.size());
+
+    std::ostringstream diff;
+    diff << "--- expected\n";
+    diff << "+++ actual\n";
+    diff << "@@ -1," << expected_lines.size() << " +1," << actual_lines.size() << " @@\n";
+
+    for (std::size_t index = 0; index < max_lines; ++index) {
+        const bool has_expected = index < expected_lines.size();
+        const bool has_actual = index < actual_lines.size();
+
+        if (has_expected && has_actual && expected_lines[index] == actual_lines[index]) {
+            diff << " " << expected_lines[index] << "\n";
+            continue;
+        }
+        if (has_expected) {
+            diff << "-" << expected_lines[index] << "\n";
+        }
+        if (has_actual) {
+            diff << "+" << actual_lines[index] << "\n";
+        }
+    }
+
     return diff.str();
+}
+
+inline void assertScenarioMatchesExpected(const std::filesystem::path& expected_path,
+                                          const std::filesystem::path& cli_path,
+                                          const std::string& scenario,
+                                          const std::string& test_id) {
+    if (!std::filesystem::exists(expected_path)) {
+        throw std::runtime_error("Golden master baseline missing: " + expected_path.string());
+    }
+
+    const std::string expected_document = readTextFile(expected_path);
+    const std::string expected_section = extractSection(expected_document, scenario);
+    const std::string actual_section = buildScenarioBlockFromCli(cli_path, scenario);
+
+    if (expected_section == actual_section) {
+        return;
+    }
+
+    const std::string diff = makeUnifiedDiff(expected_section, actual_section);
+    throw std::runtime_error(test_id + " [" + scenario + "] golden master mismatch.\n" + diff);
 }
 
 inline std::filesystem::path defaultExpectedPath() {
