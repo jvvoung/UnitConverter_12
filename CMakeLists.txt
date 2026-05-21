@@ -94,3 +94,10 @@ target_link_libraries(unit_converter_cli PRIVATE
   unit_converter_boundary
   unit_converter_data
 )
+
+add_unit_converter_test(unit_converter_golden_master_tests
+  tests/golden_master_tests.cpp
+)
+target_compile_definitions(unit_converter_golden_master_tests PRIVATE
+  UNIT_CONVERTER_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
+add_dependencies(unit_converter_golden_master_tests unit_converter_cli)
