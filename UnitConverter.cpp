@@ -1,5 +1,5 @@
 #include "domain/UnitCatalog.hpp"
-#include "logic/conversion_ratios.hpp"
+#include "domain/conversion_ratios.hpp"
 
 #include <iostream>
 #include <string>
@@ -7,13 +7,7 @@
 namespace {
 
 UnitCatalog& legacyCliCatalog() {
-    static UnitCatalog catalog = [] {
-        UnitCatalog units;
-        units.add("meter", 1.0);
-        units.add("feet", 1.0 / conversion_ratios::METER_TO_FEET);
-        units.add("yard", 1.0 / conversion_ratios::METER_TO_YARD);
-        return units;
-    }();
+    static UnitCatalog catalog = bootstrap_legacy_cli_catalog();
     return catalog;
 }
 

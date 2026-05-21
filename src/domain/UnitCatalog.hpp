@@ -20,6 +20,7 @@ private:
 };
 
 UnitCatalog bootstrap_default_three_units();
+UnitCatalog bootstrap_legacy_cli_catalog();
 
 class DuplicateUnitError : public std::runtime_error {
 public:
