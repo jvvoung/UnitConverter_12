@@ -50,6 +50,11 @@ add_library(unit_converter_data
 target_include_directories(unit_converter_data PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(unit_converter_data PUBLIC unit_converter_domain)
 
+add_library(unit_converter_decaying
+  src/DecayingUnit.cpp
+)
+target_include_directories(unit_converter_decaying PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
 add_library(unit_converter_logic
   src/logic/UnitConverterLogic.cpp
 )
@@ -89,6 +94,17 @@ add_unit_converter_test(unit_converter_red_dual_track_tests
   tests/domain_logic_red_tests.cpp
 )
 target_link_libraries(unit_converter_red_dual_track_tests PRIVATE unit_converter_logic)
+
+add_executable(unit_converter_bonus_tests tests/test_decaying_unit.cpp)
+if(MSVC)
+  target_compile_options(unit_converter_bonus_tests PRIVATE /utf-8)
+endif()
+target_link_libraries(unit_converter_bonus_tests PRIVATE
+  unit_converter_decaying
+  Catch2::Catch2WithMain
+)
+target_include_directories(unit_converter_bonus_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+catch_discover_tests(unit_converter_bonus_tests)
 
 add_executable(unit_converter_cli UnitConverter.cpp)
 target_include_directories(unit_converter_cli PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
