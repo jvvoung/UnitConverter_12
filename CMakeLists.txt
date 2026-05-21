@@ -35,6 +35,7 @@ add_library(unit_converter_boundary
   src/boundary/InputParser.cpp
   src/boundary/ValueValidator.cpp
   src/boundary/TableFormatter.cpp
+  src/boundary/CliOutputFormatter.cpp
   src/boundary/ConversionApplicationService.cpp
 )
 target_include_directories(unit_converter_boundary PUBLIC
