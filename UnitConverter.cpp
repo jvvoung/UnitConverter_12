@@ -1,3 +1,5 @@
+#include "boundary/CliErrorMessages.hpp"
+#include "boundary/CliOutputFormatter.hpp"
 #include "boundary/InputParser.hpp"
 #include "domain/LegacyCliConversion.hpp"
 #include "domain/UnitCatalog.hpp"
@@ -22,20 +24,22 @@ int main() {
 
     const auto parsed = InputParser::parseConvertLine(input);
     if (!parsed.ok) {
-        std::cerr << parsed.error_message << std::endl;
+        std::cerr << cli_error_messages::formatParseError(parsed.error, parsed.value_token)
+                  << std::endl;
         return 1;
     }
 
     UnitCatalog& catalog = legacyCliCatalog();
     if (!catalog.has(parsed.unit)) {
-        std::cerr << "Unknown unit: " << parsed.unit << std::endl;
+        std::cerr << cli_error_messages::unknownUnit(parsed.unit) << std::endl;
         return 1;
     }
 
     const auto converted = legacyCliConvertAll(catalog, parsed.unit, parsed.value);
     for (const auto& target_unit : legacyCliDisplayUnitOrder()) {
-        std::cout << parsed.value << " " << parsed.unit << " = " << converted.at(target_unit)
-                  << " " << target_unit << std::endl;
+        std::cout << CliOutputFormatter::formatLine(parsed.value_token, parsed.unit,
+                                                    converted.at(target_unit), target_unit)
+                  << std::endl;
     }
 
     return 0;
