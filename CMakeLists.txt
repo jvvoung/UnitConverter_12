@@ -90,6 +90,7 @@ add_unit_converter_test(unit_converter_red_dual_track_tests
 target_link_libraries(unit_converter_red_dual_track_tests PRIVATE unit_converter_logic)
 
 add_executable(unit_converter_cli UnitConverter.cpp)
+target_include_directories(unit_converter_cli PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(unit_converter_cli PRIVATE
   unit_converter_domain
   unit_converter_boundary

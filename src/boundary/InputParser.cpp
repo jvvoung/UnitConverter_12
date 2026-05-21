@@ -22,7 +22,7 @@ bool isValidUnitName(const std::string& unit) {
     return true;
 }
 
-bool parsePositiveFiniteDouble(const std::string& token, double& out) {
+bool parseFiniteDouble(const std::string& token, double& out) {
     if (token.empty()) {
         return false;
     }
@@ -58,7 +58,7 @@ ConvertParseResult InputParser::parseConvertLine(const std::string& line) {
         return result;
     }
 
-    if (!parsePositiveFiniteDouble(result.value_token, result.value)) {
+    if (!parseFiniteDouble(result.value_token, result.value)) {
         result.error = ParseErrorCode::InvalidNumber;
         result.error_message = formatErrorMessage(ParseErrorCode::InvalidNumber, result.value_token);
         return result;
