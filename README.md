@@ -193,8 +193,8 @@ TEST_CASE("meter:-2.5 rejected before conversion", "[boundary][red]") {
 - [ ] 전체 TOTAL: 90%+
 
 ### 결함 목록 연결
-- [ ] docs폴더에 defect_list.md 생성 및 발견 결함 기록
-- [ ] 모든 결함 수정 후 회귀 테스트 통과 확인
+- [x] docs폴더에 [defect_list.md](docs/defect_list.md) 생성 및 발견 결함 기록
+- [ ] 모든 결함 수정 후 회귀 테스트 통과 확인 (Open: DEF-002, DEF-003)
 
 ---
 
