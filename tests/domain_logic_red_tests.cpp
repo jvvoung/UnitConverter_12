@@ -25,12 +25,21 @@ TEST_CASE("convert_meter_to_yard_returns_correct_ratio", "[logic][green]") {
     REQUIRE_THAT(result, WithinAbs(1.09361, 1e-5));
 }
 
-TEST_CASE("convert_all_returns_all_registered_targets", "[logic][red]") {
-    FAIL("RED");
+TEST_CASE("convert_all_returns_all_registered_targets", "[logic][green]") {
+    UnitConverterLogic::resetToDefaults();
+    const auto all = UnitConverterLogic::convertAll("meter", 2.5);
+    REQUIRE(all.size() == 2);
+    REQUIRE(all.count("feet") == 1);
+    REQUIRE(all.count("yard") == 1);
+    REQUIRE_THAT(all.at("feet"), WithinAbs(8.20210, 1e-5));
+    REQUIRE_THAT(all.at("yard"), WithinAbs(2.734025, 1e-5));
 }
 
-TEST_CASE("register_unit_enables_conversion", "[logic][red]") {
-    FAIL("RED");
+TEST_CASE("register_unit_enables_conversion", "[logic][green]") {
+    UnitConverterLogic::resetToDefaults();
+    UnitConverterLogic::registerUnit("cubit", 0.4572);
+    const double result = UnitConverterLogic::convert("cubit", 2.0, "meter");
+    REQUIRE_THAT(result, WithinAbs(0.9144, 1e-5));
 }
 
 TEST_CASE("load_config_applies_ratios_from_file", "[logic][red]") {
