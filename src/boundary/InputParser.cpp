@@ -1,6 +1,7 @@
 #include "boundary/InputParser.hpp"
 
 #include <cctype>
+#include <cmath>
 #include <sstream>
 
 namespace {
