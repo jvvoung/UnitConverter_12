@@ -44,6 +44,14 @@ add_library(unit_converter_data
 target_include_directories(unit_converter_data PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(unit_converter_data PUBLIC unit_converter_domain)
 
+add_library(unit_converter_logic
+  src/logic/UnitConverterLogic.cpp
+)
+target_include_directories(unit_converter_logic PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/src
+  ${CMAKE_CURRENT_SOURCE_DIR}/tests/helpers
+)
+
 function(add_unit_converter_test target)
   add_executable(${target} ${ARGN})
   target_compile_definitions(${target} PRIVATE
@@ -73,6 +81,7 @@ add_unit_converter_test(unit_converter_red_dual_track_tests
   tests/ui_boundary_red_tests.cpp
   tests/domain_logic_red_tests.cpp
 )
+target_link_libraries(unit_converter_red_dual_track_tests PRIVATE unit_converter_logic)
 
 add_executable(unit_converter_cli UnitConverter.cpp)
 target_link_libraries(unit_converter_cli PRIVATE
