@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "base_unit": "meter",
+  "units": [
+    { "name": "meter", "meters_per_unit": 1.0 },
+    { "name": "feet", "meters_per_unit": 0.3048 },
+    { "name": "yard", "meters_per_unit": 0.9144 }
+  ]
+}
