@@ -13,8 +13,9 @@ TEST_CASE("input_without_colon_throws_invalid_argument", "[ui][green]") {
     REQUIRE_THROWS_AS(service.convert("meter2.5"), std::invalid_argument);
 }
 
-TEST_CASE("negative_value_throws_invalid_argument", "[ui][red]") {
-    FAIL("RED");
+TEST_CASE("negative_value_throws_invalid_argument", "[ui][green]") {
+    ConversionApplicationService service;
+    REQUIRE_THROWS_AS(service.convert("meter:-1.0"), std::invalid_argument);
 }
 
 TEST_CASE("unknown_unit_throws_invalid_argument", "[ui][red]") {
