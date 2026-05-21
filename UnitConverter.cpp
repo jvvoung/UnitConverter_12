@@ -1,3 +1,4 @@
+#include "boundary/InputParser.hpp"
 #include "domain/LegacyCliConversion.hpp"
 #include "domain/UnitCatalog.hpp"
 
@@ -19,35 +20,22 @@ int main() {
     std::string input;
     std::getline(std::cin, input);
 
-    std::string unit;
-    double value = 0.0;
-
-    std::size_t pos = input.find(':');
-    if (pos == std::string::npos) {
-        std::cerr << "Invalid format. Use unit:value (ex: meter:2.5)" << std::endl;
-        return 1;
-    }
-
-    unit = input.substr(0, pos);
-    std::string valueStr = input.substr(pos + 1);
-
-    try {
-        value = std::stod(valueStr);
-    } catch (...) {
-        std::cerr << "Invalid number: " << valueStr << std::endl;
+    const auto parsed = InputParser::parseConvertLine(input);
+    if (!parsed.ok) {
+        std::cerr << parsed.error_message << std::endl;
         return 1;
     }
 
     UnitCatalog& catalog = legacyCliCatalog();
-    if (!catalog.has(unit)) {
-        std::cerr << "Unknown unit: " << unit << std::endl;
+    if (!catalog.has(parsed.unit)) {
+        std::cerr << "Unknown unit: " << parsed.unit << std::endl;
         return 1;
     }
 
-    const auto converted = legacyCliConvertAll(catalog, unit, value);
+    const auto converted = legacyCliConvertAll(catalog, parsed.unit, parsed.value);
     for (const auto& target_unit : legacyCliDisplayUnitOrder()) {
-        std::cout << value << " " << unit << " = " << converted.at(target_unit) << " "
-                  << target_unit << std::endl;
+        std::cout << parsed.value << " " << parsed.unit << " = " << converted.at(target_unit)
+                  << " " << target_unit << std::endl;
     }
 
     return 0;
