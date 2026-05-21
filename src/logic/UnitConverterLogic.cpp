@@ -12,6 +12,9 @@ double UnitConverterLogic::convert(const std::string& from_unit, double value,
     if (from_unit == "meter" && to_unit == "yard") {
         return value * conversion_ratios::METER_TO_YARD;
     }
+    if (from_unit == "feet" && to_unit == "meter") {
+        return value * conversion_ratios::FEET_TO_METER;
+    }
     return 0.0;
 }
 

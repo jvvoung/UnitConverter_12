@@ -13,8 +13,10 @@ TEST_CASE("convert_meter_to_feet_returns_correct_ratio", "[logic][green]") {
     REQUIRE_THAT(result, WithinAbs(8.20210, 1e-5));
 }
 
-TEST_CASE("convert_feet_to_meter_returns_correct_ratio", "[logic][red]") {
-    FAIL("RED");
+TEST_CASE("convert_feet_to_meter_returns_correct_ratio", "[logic][green]") {
+    UnitConverterLogic::resetToDefaults();
+    const double result = UnitConverterLogic::convert("feet", 1.0, "meter");
+    REQUIRE_THAT(result, WithinAbs(0.30480, 1e-5));
 }
 
 TEST_CASE("convert_meter_to_yard_returns_correct_ratio", "[logic][green]") {
