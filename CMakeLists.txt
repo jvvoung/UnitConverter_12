@@ -1,0 +1,77 @@
+cmake_minimum_required(VERSION 3.16)
+project(UnitConverter_12 VERSION 1.0 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+option(ENABLE_COVERAGE "Build with gcov coverage flags" OFF)
+if(ENABLE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  add_compile_options(--coverage -O0 -g)
+  add_link_options(--coverage)
+endif()
+
+include(FetchContent)
+FetchContent_Declare(
+  Catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG v3.5.4
+)
+FetchContent_MakeAvailable(Catch2)
+
+list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
+include(CTest)
+include(Catch)
+
+add_library(unit_converter_domain
+  src/domain/UnitCatalog.cpp
+  src/domain/ConversionEngine.cpp
+  src/domain/LengthQuantity.cpp
+)
+target_include_directories(unit_converter_domain PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+add_library(unit_converter_boundary
+  src/boundary/InputParser.cpp
+  src/boundary/ValueValidator.cpp
+  src/boundary/TableFormatter.cpp
+)
+target_include_directories(unit_converter_boundary PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_link_libraries(unit_converter_boundary PUBLIC unit_converter_domain)
+
+add_library(unit_converter_data
+  src/data/ConfigLoader.cpp
+)
+target_include_directories(unit_converter_data PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_link_libraries(unit_converter_data PUBLIC unit_converter_domain)
+
+function(add_unit_converter_test target)
+  add_executable(${target} ${ARGN})
+  target_compile_definitions(${target} PRIVATE
+    UNIT_CONVERTER_TEST_DATA_DIR="${CMAKE_SOURCE_DIR}/testdata")
+  target_link_libraries(${target} PRIVATE
+    unit_converter_domain
+    unit_converter_boundary
+    unit_converter_data
+    Catch2::Catch2WithMain
+  )
+  target_include_directories(${target} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests/helpers)
+  catch_discover_tests(${target})
+endfunction()
+
+add_unit_converter_test(unit_converter_domain_tests
+  tests/domain_normal_conversion_tests.cpp
+  tests/domain_boundary_tests.cpp
+  tests/domain_exception_tests.cpp
+  tests/domain_register_tests.cpp
+)
+
+add_unit_converter_test(unit_converter_data_tests
+  tests/data_config_tests.cpp
+)
+
+add_executable(unit_converter_cli UnitConverter.cpp)
+target_link_libraries(unit_converter_cli PRIVATE
+  unit_converter_domain
+  unit_converter_boundary
+  unit_converter_data
+)

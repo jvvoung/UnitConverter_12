@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "base_unit": "feet",
+  "units": [
+    { "name": "meter", "meters_per_unit": 1.0 }
+  ]
+}
