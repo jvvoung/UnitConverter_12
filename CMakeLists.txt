@@ -27,6 +27,7 @@ add_library(unit_converter_domain
   src/domain/UnitCatalog.cpp
   src/domain/ConversionEngine.cpp
   src/domain/LengthQuantity.cpp
+  src/domain/LegacyCliConversion.cpp
 )
 target_include_directories(unit_converter_domain PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
@@ -34,6 +35,7 @@ add_library(unit_converter_boundary
   src/boundary/InputParser.cpp
   src/boundary/ValueValidator.cpp
   src/boundary/TableFormatter.cpp
+  src/boundary/CliOutputFormatter.cpp
   src/boundary/ConversionApplicationService.cpp
 )
 target_include_directories(unit_converter_boundary PUBLIC
@@ -89,8 +91,29 @@ add_unit_converter_test(unit_converter_red_dual_track_tests
 target_link_libraries(unit_converter_red_dual_track_tests PRIVATE unit_converter_logic)
 
 add_executable(unit_converter_cli UnitConverter.cpp)
+target_include_directories(unit_converter_cli PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(unit_converter_cli PRIVATE
   unit_converter_domain
   unit_converter_boundary
   unit_converter_data
+)
+
+add_executable(UnitConverter_test tests/test_golden_master.cpp)
+target_compile_definitions(UnitConverter_test PRIVATE
+  UNIT_CONVERTER_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+  UNIT_CONVERTER_BUILD_DIR="${CMAKE_BINARY_DIR}"
+  UNIT_CONVERTER_TEST_DATA_DIR="${CMAKE_SOURCE_DIR}/testdata")
+target_link_libraries(UnitConverter_test PRIVATE
+  unit_converter_domain
+  unit_converter_boundary
+  unit_converter_data
+  Catch2::Catch2WithMain
+)
+target_include_directories(UnitConverter_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests/helpers)
+add_dependencies(UnitConverter_test unit_converter_cli)
+
+add_test(NAME GoldenMaster COMMAND $<TARGET_FILE:UnitConverter_test>)
+set_tests_properties(GoldenMaster PROPERTIES
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  LABELS "golden;regression;approval"
 )

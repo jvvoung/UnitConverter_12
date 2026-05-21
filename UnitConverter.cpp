@@ -1,6 +1,20 @@
+#include "boundary/CliErrorMessages.hpp"
+#include "boundary/CliOutputFormatter.hpp"
+#include "boundary/InputParser.hpp"
+#include "domain/LegacyCliConversion.hpp"
+#include "domain/UnitCatalog.hpp"
+
 #include <iostream>
-#include <sstream>
 #include <string>
+
+namespace {
+
+UnitCatalog& legacyCliCatalog() {
+    static UnitCatalog catalog = bootstrap_legacy_cli_catalog();
+    return catalog;
+}
+
+}  // namespace
 
 int main() {
     std::cout << "Insert value for converting (ex: meter:2.5): ";
@@ -8,45 +22,25 @@ int main() {
     std::string input;
     std::getline(std::cin, input);
 
-    std::string unit;
-    double value = 0.0;
-
-    std::size_t pos = input.find(':');
-    if (pos == std::string::npos) {
-        std::cerr << "Invalid format. Use unit:value (ex: meter:2.5)" << std::endl;
+    const auto parsed = InputParser::parseConvertLine(input);
+    if (!parsed.ok) {
+        std::cerr << cli_error_messages::formatParseError(parsed.error, parsed.value_token)
+                  << std::endl;
         return 1;
     }
 
-    unit = input.substr(0, pos);
-    std::string valueStr = input.substr(pos + 1);
-
-    try {
-        value = std::stod(valueStr);
-    } catch (...) {
-        std::cerr << "Invalid number: " << valueStr << std::endl;
+    UnitCatalog& catalog = legacyCliCatalog();
+    if (!catalog.has(parsed.unit)) {
+        std::cerr << cli_error_messages::unknownUnit(parsed.unit) << std::endl;
         return 1;
     }
 
-    double meterValue = 0.0;
-
-    if (unit == "meter") {
-        meterValue = value;
-    } else if (unit == "feet") {
-        meterValue = value / 3.28084;
-    } else if (unit == "yard") {
-        meterValue = value / 1.09361;
-    } else {
-        std::cerr << "Unknown unit: " << unit << std::endl;
-        return 1;
+    const auto converted = legacyCliConvertAll(catalog, parsed.unit, parsed.value);
+    for (const auto& target_unit : legacyCliDisplayUnitOrder()) {
+        std::cout << CliOutputFormatter::formatLine(parsed.value_token, parsed.unit,
+                                                    converted.at(target_unit), target_unit)
+                  << std::endl;
     }
-
-    double inMeters = meterValue;
-    double inFeet = meterValue * 3.28084;
-    double inYards = meterValue * 1.09361;
-
-    std::cout << value << " " << unit << " = " << inMeters << " meter" << std::endl;
-    std::cout << value << " " << unit << " = " << inFeet << " feet" << std::endl;
-    std::cout << value << " " << unit << " = " << inYards << " yard" << std::endl;
 
     return 0;
 }

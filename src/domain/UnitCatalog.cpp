@@ -1,4 +1,5 @@
 #include "domain/UnitCatalog.hpp"
+#include "domain/conversion_ratios.hpp"
 
 #include <cmath>
 #include <algorithm>
@@ -52,6 +53,14 @@ UnitCatalog bootstrap_default_three_units() {
     catalog.add("meter", 1.0);
     catalog.add("feet", 0.3048);
     catalog.add("yard", 0.9144);
+    return catalog;
+}
+
+UnitCatalog bootstrap_legacy_cli_catalog() {
+    UnitCatalog catalog;
+    catalog.add("meter", 1.0);
+    catalog.add("feet", 1.0 / conversion_ratios::METER_TO_FEET);
+    catalog.add("yard", 1.0 / conversion_ratios::METER_TO_YARD);
     return catalog;
 }
 
