@@ -14,6 +14,7 @@
 - [현재 진행 상태](#현재-진행-상태)
 - [TDD × Cursor AI 워크플로우 (RED 단계)](#tdd--cursor-ai-워크플로우-red-단계)
 - [RED 단계 To-Do 리스트](#red-단계-to-do-리스트)
+- [Golden Master 회귀 안전장치](#golden-master-회귀-안전장치)
 - [빠른 시작 (Quick Start)](#빠른-시작-quick-start)
 - [지원 단위 및 비율](#지원-단위-및-비율)
 - [입력 형식 계약](#입력-형식-계약)
@@ -195,6 +196,27 @@ TEST_CASE("meter:-2.5 rejected before conversion", "[boundary][red]") {
 ### 결함 목록 연결
 - [x] docs폴더에 [defect_list.md](docs/defect_list.md) 생성 및 발견 결함 기록
 - [ ] 모든 결함 수정 후 회귀 테스트 통과 확인 (Open: DEF-002, DEF-003)
+
+---
+
+## Golden Master 회귀 안전장치
+
+> Refactoring 시작 전 구축. GREEN 완료 후 즉시 적용.
+
+### 기준 파일 생성
+- [ ] GM-01: golden_master_expected.txt 생성 (meter:2.5 기준 출력)
+- [ ] GM-02: feet:1.0 / yard:1.0 / meter:0.0 시나리오 추가
+- [ ] GM-03: git add tests/golden_master_expected.txt (버전 관리 포함)
+
+### 테스트 코드
+- [ ] GM-04: test_golden_master.cpp + golden_master_expected.txt 작성
+- [ ] GM-05: approve 패턴 적용 (파일 없으면 생성, 있으면 비교)
+- [ ] GM-06: CMake: add_test(NAME GoldenMaster COMMAND UnitConverter_test) → PASS 확인
+
+### CI 연동
+- [ ] GM-07: .github/workflows/golden_master.yml 작성
+- [ ] GM-08: PR 머지 차단 (required status check) 설정
+- [ ] GM-09: Refactoring 후 Golden Master 재실행 → PASS 확인
 
 ---
 
