@@ -69,6 +69,11 @@ add_unit_converter_test(unit_converter_data_tests
   tests/data_config_tests.cpp
 )
 
+add_unit_converter_test(unit_converter_red_dual_track_tests
+  tests/ui_boundary_red_tests.cpp
+  tests/domain_logic_red_tests.cpp
+)
+
 add_executable(unit_converter_cli UnitConverter.cpp)
 target_link_libraries(unit_converter_cli PRIVATE
   unit_converter_domain
