@@ -1,6 +1,27 @@
+#include "domain/UnitCatalog.hpp"
+#include "logic/conversion_ratios.hpp"
+
 #include <iostream>
-#include <sstream>
 #include <string>
+
+namespace {
+
+UnitCatalog& legacyCliCatalog() {
+    static UnitCatalog catalog = [] {
+        UnitCatalog units;
+        units.add("meter", 1.0);
+        units.add("feet", 1.0 / conversion_ratios::METER_TO_FEET);
+        units.add("yard", 1.0 / conversion_ratios::METER_TO_YARD);
+        return units;
+    }();
+    return catalog;
+}
+
+double toMeters(const UnitCatalog& catalog, const std::string& unit, double value) {
+    return value * catalog.metersPerUnit(unit);
+}
+
+}  // namespace
 
 int main() {
     std::cout << "Insert value for converting (ex: meter:2.5): ";
@@ -27,22 +48,16 @@ int main() {
         return 1;
     }
 
-    double meterValue = 0.0;
-
-    if (unit == "meter") {
-        meterValue = value;
-    } else if (unit == "feet") {
-        meterValue = value / 3.28084;
-    } else if (unit == "yard") {
-        meterValue = value / 1.09361;
-    } else {
+    UnitCatalog& catalog = legacyCliCatalog();
+    if (!catalog.has(unit)) {
         std::cerr << "Unknown unit: " << unit << std::endl;
         return 1;
     }
 
-    double inMeters = meterValue;
-    double inFeet = meterValue * 3.28084;
-    double inYards = meterValue * 1.09361;
+    const double meterValue = toMeters(catalog, unit, value);
+    const double inMeters = meterValue;
+    const double inFeet = meterValue * conversion_ratios::METER_TO_FEET;
+    const double inYards = meterValue * conversion_ratios::METER_TO_YARD;
 
     std::cout << value << " " << unit << " = " << inMeters << " meter" << std::endl;
     std::cout << value << " " << unit << " = " << inFeet << " feet" << std::endl;
