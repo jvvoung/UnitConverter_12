@@ -27,6 +27,7 @@ add_library(unit_converter_domain
   src/domain/UnitCatalog.cpp
   src/domain/ConversionEngine.cpp
   src/domain/LengthQuantity.cpp
+  src/domain/LegacyCliConversion.cpp
 )
 target_include_directories(unit_converter_domain PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 

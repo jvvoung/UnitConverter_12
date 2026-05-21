@@ -1,5 +1,5 @@
+#include "domain/LegacyCliConversion.hpp"
 #include "domain/UnitCatalog.hpp"
-#include "domain/conversion_ratios.hpp"
 
 #include <iostream>
 #include <string>
@@ -9,10 +9,6 @@ namespace {
 UnitCatalog& legacyCliCatalog() {
     static UnitCatalog catalog = bootstrap_legacy_cli_catalog();
     return catalog;
-}
-
-double toMeters(const UnitCatalog& catalog, const std::string& unit, double value) {
-    return value * catalog.metersPerUnit(unit);
 }
 
 }  // namespace
@@ -48,14 +44,11 @@ int main() {
         return 1;
     }
 
-    const double meterValue = toMeters(catalog, unit, value);
-    const double inMeters = meterValue;
-    const double inFeet = meterValue * conversion_ratios::METER_TO_FEET;
-    const double inYards = meterValue * conversion_ratios::METER_TO_YARD;
-
-    std::cout << value << " " << unit << " = " << inMeters << " meter" << std::endl;
-    std::cout << value << " " << unit << " = " << inFeet << " feet" << std::endl;
-    std::cout << value << " " << unit << " = " << inYards << " yard" << std::endl;
+    const auto converted = legacyCliConvertAll(catalog, unit, value);
+    for (const auto& target_unit : legacyCliDisplayUnitOrder()) {
+        std::cout << value << " " << unit << " = " << converted.at(target_unit) << " "
+                  << target_unit << std::endl;
+    }
 
     return 0;
 }
