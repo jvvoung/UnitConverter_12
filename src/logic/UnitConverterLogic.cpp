@@ -1,5 +1,6 @@
 #include "red_logic_contract.hpp"
 
+#include "data/ConfigLoader.hpp"
 #include "domain/ConversionEngine.hpp"
 #include "domain/UnitCatalog.hpp"
 
@@ -34,4 +35,10 @@ void UnitConverterLogic::registerUnit(const std::string& name, double ratio_to_m
     logicCatalog().registerUnit(name, ratio_to_meter);
 }
 
-void UnitConverterLogic::loadConfig(const std::string& /*path*/) {}
+void UnitConverterLogic::loadConfig(const std::string& path) {
+    try {
+        ConfigLoader::loadFromFile(path, logicCatalog());
+    } catch (...) {
+        logicCatalog() = bootstrap_default_three_units();
+    }
+}

@@ -55,7 +55,7 @@ target_include_directories(unit_converter_logic PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   ${CMAKE_CURRENT_SOURCE_DIR}/tests/helpers
 )
-target_link_libraries(unit_converter_logic PUBLIC unit_converter_domain)
+target_link_libraries(unit_converter_logic PUBLIC unit_converter_domain unit_converter_data)
 
 function(add_unit_converter_test target)
   add_executable(${target} ${ARGN})

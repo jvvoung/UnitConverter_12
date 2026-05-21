@@ -42,10 +42,16 @@ TEST_CASE("register_unit_enables_conversion", "[logic][green]") {
     REQUIRE_THAT(result, WithinAbs(0.9144, 1e-5));
 }
 
-TEST_CASE("load_config_applies_ratios_from_file", "[logic][red]") {
-    FAIL("RED");
+TEST_CASE("load_config_applies_ratios_from_file", "[logic][green]") {
+    UnitConverterLogic::resetToDefaults();
+    UnitConverterLogic::loadConfig(UNIT_CONVERTER_TEST_DATA_DIR "/units_valid.json");
+    const double result = UnitConverterLogic::convert("meter", 2.5, "feet");
+    REQUIRE_THAT(result, WithinAbs(8.20210, 1e-5));
 }
 
-TEST_CASE("load_config_invalid_path_keeps_defaults", "[logic][red]") {
-    FAIL("RED");
+TEST_CASE("load_config_invalid_path_keeps_defaults", "[logic][green]") {
+    UnitConverterLogic::resetToDefaults();
+    UnitConverterLogic::loadConfig("no_such_file.json");
+    REQUIRE_THAT(UnitConverterLogic::convert("meter", 2.5, "feet"), WithinAbs(8.20210, 1e-5));
+    REQUIRE_THAT(UnitConverterLogic::convert("meter", 1.0, "yard"), WithinAbs(1.09361, 1e-5));
 }
