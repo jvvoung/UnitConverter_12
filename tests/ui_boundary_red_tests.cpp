@@ -1,11 +1,13 @@
 #include <catch2/catch_test_macros.hpp>
+#include <string>
 
 #include "red_ui_contract.hpp"
 
 // Track A - UI / Boundary (ConversionApplicationService)
 
-TEST_CASE("valid_input_meter_colon_value_returns_conversion_result", "[ui][red]") {
-    FAIL("RED");
+TEST_CASE("valid_input_meter_colon_value_returns_conversion_result", "[ui][green]") {
+    ConversionApplicationService service;
+    REQUIRE(service.convert("meter:2.5") == "2.5 meter = 8.202100 feet");
 }
 
 TEST_CASE("input_without_colon_throws_invalid_argument", "[ui][green]") {
@@ -23,8 +25,15 @@ TEST_CASE("unknown_unit_throws_invalid_argument", "[ui][green]") {
     REQUIRE_THROWS_AS(service.convert("parsec:1.0"), std::invalid_argument);
 }
 
-TEST_CASE("output_preserves_source_unit_and_value", "[ui][red]") {
-    FAIL("RED");
+TEST_CASE("output_preserves_source_unit_and_value", "[ui][green]") {
+    ConversionApplicationService service;
+    const std::string result = service.convert("meter:2.5");
+    REQUIRE(result.rfind("2.5 meter =", 0) == 0);
+}
+
+TEST_CASE("zero_value_throws_invalid_argument", "[ui][green]") {
+    ConversionApplicationService service;
+    REQUIRE_THROWS_AS(service.convert("meter:0"), std::invalid_argument);
 }
 
 TEST_CASE("json_format_returns_valid_schema", "[ui][red]") {
