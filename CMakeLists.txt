@@ -34,8 +34,12 @@ add_library(unit_converter_boundary
   src/boundary/InputParser.cpp
   src/boundary/ValueValidator.cpp
   src/boundary/TableFormatter.cpp
+  src/boundary/ConversionApplicationService.cpp
 )
-target_include_directories(unit_converter_boundary PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(unit_converter_boundary PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/src
+  ${CMAKE_CURRENT_SOURCE_DIR}/tests/helpers
+)
 target_link_libraries(unit_converter_boundary PUBLIC unit_converter_domain)
 
 add_library(unit_converter_data

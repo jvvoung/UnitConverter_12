@@ -1,13 +1,16 @@
 #include <catch2/catch_test_macros.hpp>
 
-// Track A - UI / Boundary RED (ConversionApplicationService)
+#include "red_ui_contract.hpp"
+
+// Track A - UI / Boundary (ConversionApplicationService)
 
 TEST_CASE("valid_input_meter_colon_value_returns_conversion_result", "[ui][red]") {
     FAIL("RED");
 }
 
-TEST_CASE("input_without_colon_throws_invalid_argument", "[ui][red]") {
-    FAIL("RED");
+TEST_CASE("input_without_colon_throws_invalid_argument", "[ui][green]") {
+    ConversionApplicationService service;
+    REQUIRE_THROWS_AS(service.convert("meter2.5"), std::invalid_argument);
 }
 
 TEST_CASE("negative_value_throws_invalid_argument", "[ui][red]") {
